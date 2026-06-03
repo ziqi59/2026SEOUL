@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -9,58 +10,87 @@
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    
     <style>
         /* 頁面載入動畫 */
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-        .animate-fade-in { animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-        
-        /* 隱藏捲軸但保持滾動功能 */
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        
-        /* 質感噪點紋理與點狀點綴 */
-        .grain-overlay { position: relative; }
-        .grain-overlay::before { 
-            content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-            pointer-events: none; z-index: 50; opacity: 0.15; 
-            background-image: url("https://www.transparenttextures.com/patterns/natural-paper.png"); 
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
-        .dot-grid { background-image: radial-gradient(#d7dce7 0.6px, transparent 0.6px); background-size: 20px 20px; }
-        
-        * { -webkit-tap-highlight-color: transparent; outline: none; }
-        .lucide-icon-wrapper svg { display: inline-block; vertical-align: middle; }
+
+        .animate-fade-in {
+            animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* 隱藏捲軸但保持滾動功能 */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* 質感噪點紋理與點狀點綴 */
+        .grain-overlay {
+            position: relative;
+        }
+
+        .grain-overlay::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 50;
+            opacity: 0.15;
+            background-image: url("https://www.transparenttextures.com/patterns/natural-paper.png");
+        }
+
+        .dot-grid {
+            background-image: radial-gradient(#d7dce7 0.6px, transparent 0.6px);
+            background-size: 20px 20px;
+        }
+
+        * {
+            -webkit-tap-highlight-color: transparent;
+            outline: none;
+        }
+
+        .lucide-icon-wrapper svg {
+            display: inline-block;
+            vertical-align: middle;
+        }
     </style>
 </head>
+
 <body class="bg-[#5c6488] min-h-screen flex justify-center items-center py-0 sm:py-3">
     <div id="root" class="w-full max-w-[390px]"></div>
-
     <script type="text/babel">
         const { useState, useEffect, useMemo, useRef } = React;
 
         // --- 1. 基礎圖示與元件 ---
-
-        const SeoulIllustration = () => (
-            <svg viewBox="0 0 200 100" className="w-12 h-auto opacity-40 text-[#d7dce7]">
-                <path d="M70,90 L70,45 L130,45 L130,90 Z" fill="currentColor" />
-                <path d="M96,45 L100,20 L104,45 Z" fill="currentColor" />
-                <circle cx="100" cy="55" r="10" fill="#ffffff" opacity="0.4"/>
-                <path d="M15,90 Q100,75 185,90" stroke="currentColor" strokeWidth="1.5" fill="none" />
-            </svg>
-        );
-
         const Icon = ({ name, size = 16, className = "" }) => {
             const [svgHtml, setSvgHtml] = useState("");
             useEffect(() => {
                 let mounted = true;
                 const renderIcon = () => {
                     if (!window.lucide || !window.lucide.icons) { setTimeout(renderIcon, 50); return; }
-                    const iconMap = { 
-                        "Flight": "Plane", "MapIcon": "Map", "ImageIcon": "Image", 
-                        "Transport": "Train", "Sightseeing": "Star", "Food": "Utensils", 
-                        "Shopping": "ShoppingBag", "Layout": "Layout", "Ticket": "Ticket", 
+                    const iconMap = {
+                        "Flight": "Plane", "MapIcon": "Map", "ImageIcon": "Image",
+                        "Transport": "Train", "Sightseeing": "Star", "Food": "Utensils",
+                        "Shopping": "ShoppingBag", "Layout": "Layout", "Ticket": "Ticket",
                         "Hotel": "Hotel", "ShoppingBag": "ShoppingBag", "Bus": "Bus",
-                        "Tag": "Tag", "Check": "Check", "X": "X", "Link": "ExternalLink", 
+                        "Tag": "Tag", "Check": "Check", "X": "X", "Link": "ExternalLink",
                         "Navigation": "Navigation", "Info": "Info", "User": "User", "MapPin": "MapPin", "Map": "Map",
                         "QrCode": "QrCode", "Camera": "Camera", "Sparkles": "Sparkles"
                     };
@@ -76,7 +106,6 @@
 
         const WeatherDisplay = ({ lat, lon }) => {
             const [weather, setWeather] = useState({ temp: '--', icon: '☼' });
-            
             const fetchWeather = async (retryCount = 0) => {
                 try {
                     await new Promise(resolve => setTimeout(resolve, Math.random() * 500));
@@ -85,15 +114,13 @@
                     const data = await res.json();
                     const temp = Math.round(data.current_weather.temperature);
                     const code = data.current_weather.weathercode;
-                    const isDay = data.current_weather.is_day; 
-                    
-                    let icon = isDay === 1 ? '☼' : '☾'; 
-                    if ([1, 2, 3, 45, 48].includes(code)) icon = '༄'; 
-                    if ([51, 53, 55, 61, 63, 65, 80, 81, 82, 95, 96, 99].includes(code)) icon = '⛈︎'; 
-                    if ([71, 73, 75, 77, 85, 86].includes(code)) icon = '❅'; 
-                    
+                    const isDay = data.current_weather.is_day;
+                    let icon = isDay === 1 ? '☼' : '☾';
+                    if ([1, 2, 3, 45, 48].includes(code)) icon = '༄';
+                    if ([51, 53, 55, 61, 63, 65, 80, 81, 82, 95, 96, 99].includes(code)) icon = '⛈︎';
+                    if ([71, 73, 75, 77, 85, 86].includes(code)) icon = '❅';
                     setWeather({ temp: `${temp}°C`, icon });
-                } catch (e) { 
+                } catch (e) {
                     if (retryCount < 2) setTimeout(() => fetchWeather(retryCount + 1), 3000);
                 }
             };
@@ -107,114 +134,104 @@
         };
 
         // --- 2. 全域靜態資料定義 ---
-
         const dates = [
-            { date: '6/17', weekday: '水', title: 'DAY 1 ꒰ 抵達首爾 ➳ 弘大入住', loc: { lat: 37.55, lon: 126.92, name: '弘大' } },
-            { date: '6/18', weekday: '木', title: 'DAY 2 ꒰ 百變怪遊樂場 & 首爾大公園', loc: { lat: 37.54, lon: 127.05, name: '聖水/大公園' } },
-            { date: '6/19', weekday: '金', title: 'DAY 3 ꒰ 弘大延南逛街 & T1行程', loc: { lat: 37.56, lon: 126.92, name: '弘大' } },
-            { date: '6/20', weekday: '土', title: 'DAY 4 ꒰ 現代百貨 & 漢江遊覽船', loc: { lat: 37.52, lon: 126.92, name: '汝矣島' } },
-            { date: '6/21', weekday: '日', title: 'DAY 5 ꒰ 景福宮韓服 & 三島浮艇', loc: { lat: 37.57, lon: 126.97, name: '景福宮/東大門' } },
-            { date: '6/22', weekday: '月', title: 'DAY 6 ꒰ 樂天世界 & 星空圖書館', loc: { lat: 37.51, lon: 127.10, name: '蠶室' } },
-            { date: '6/23', weekday: '火', title: 'DAY 7 ꒰ 聖水洞必買伴手禮採購', loc: { lat: 37.54, lon: 127.05, name: '聖水/東大門' } },
-            { date: '6/24', weekday: '水', title: 'DAY 8 ꒰ 仁川出境 ➳ 平安返台', loc: { lat: 37.46, lon: 126.45, name: '仁川' } },
+            { date: '6/17', weekday: '水', title: 'DAY 1 ꒰ 飛抵首爾 ➳ 入住弘大', loc: { lat: 37.55, lon: 126.92, name: '弘大' } },
+            { date: '6/18', weekday: '木', title: 'DAY 2 ꒰ 聖水玩樂 ＆ 首爾大公園', loc: { lat: 37.54, lon: 127.05, name: '聖水/大公園' } },
+            { date: '6/19', weekday: '金', title: 'DAY 3 ꒰ 弘大逛街 ＆ T1打卡商圈', loc: { lat: 37.56, lon: 126.92, name: '弘大' } },
+            { date: '6/20', weekday: '土', title: 'DAY 4 ꒰ 現代百貨 ＆ 漢江依戀遊船', loc: { lat: 37.52, lon: 126.92, name: '汝矣島' } },
+            { date: '6/21', weekday: '日', title: 'DAY 5 ꒰ 北村景福宮 ＆ 三島水上浮艇', loc: { lat: 37.57, lon: 126.97, name: '景福宮/東大門' } },
+            { date: '6/22', weekday: '月', title: 'DAY 6 ꒰ 樂天世界 ＆ 星空圖書館', loc: { lat: 37.51, lon: 127.10, name: '蠶室' } },
+            { date: '6/23', weekday: '火', title: 'DAY 7 ꒰ 聖水採購 ＆ 炸雞外送夜', loc: { lat: 37.54, lon: 127.05, name: '聖水/東大門' } },
+            { date: '6/24', weekday: '水', title: 'DAY 8 ꒰ 返程出境 ➳ 平安回台灣', loc: { lat: 37.46, lon: 126.45, name: '仁川' } },
         ];
 
         const ticketsData = [
-            { id: 'tk1', type: 'Flight', title: '中華航空 CI0162 (台北一航 → 首爾仁川二航)', date: '6/17 15:30 - 19:05', code: 'EBX8K6', model: 'A333', notice: '前兩天開放選位。入境二航後前往 1 樓入境大廳 15、16、17 號出口搭乘巴士。' },
-            { id: 'tk2', type: 'Bus', title: '機場巴士 6002 號 (往弘大)', date: '6/17 19:50發車', notice: '耗時約 60 分鐘。直達弘大住宿附近。' },
-            { id: 'tk3', type: 'Ticket', title: '首爾大公園 纜車+動物園套票', date: '6/18 下午', notice: '票價參考：$386 (含纜車2回 + 動物園入場)。' },
-            { id: 'tk4', type: 'Link', title: '九宮格拍貼機 (弘大必去行程)', date: '6/19 全天可用', url: 'https://naver.me/GRuKQwQb', notice: '營業時間：12:00 - 21:00。全體 7 人一定要一起拍的行程！' },
-            { id: 'tk5', type: 'Link', title: 'KKday 行李寄送與運送服務 (弘大➔東大門)', date: '6/21 早上辦理', url: 'https://www.kkday.com/zh-tw/product/536098?srsltid=AfmBOoqrbQXAiyLkLGcQ_uiP5N_t7yvQ7mHql-YdU0VdqsYQxbdqRgL0', notice: '費用參考：$536/件。省去換飯店時搬大行李的移動負擔。' },
-            { id: 'tk6', type: 'Ticket', title: 'Sevit 三島水上浮艇 (Tubester)', date: '6/21 18:00 - 19:30', notice: '參考 IG Reels 玩法。8-1 或 8-2 號出口步行 15 分鐘或搭計程車前往。' },
-            { id: 'tk7', type: 'Flight', title: '中華航空 CI0161 (首爾仁川二航 → 台北一航)', date: '6/24 12:45 - 14:20', code: 'EBX8K6', model: 'A333', notice: '請記得提早於出發前兩天線上選位。' }
+            { id: 'tk1', type: 'Flight', title: '中華航空 CI0162 (台北一航 ➔ 首爾仁川二航)', date: '6/17 15:30 - 19:05', code: 'EBX8K6', model: 'A333', notice: '出發前兩天開放線上選位。抵達二航後，前往 1 樓入境大廳 15、16、17 號出口搭乘機場巴士。' },
+            { id: 'tk2', type: 'Bus', title: '機場巴士 6002 號 (往弘大)', date: '6/17 19:50 發車', notice: '車程約 60 分鐘。直達弘大住宿周邊。' },
+            { id: 'tk3', type: 'Ticket', title: '首爾大公園 天空纜車＋動物園套票', date: '6/18 下午', notice: '票價參考：約 $386 (含纜車 2 回 ＋ 動物園入場)。' },
+            { id: 'tk4', type: 'Link', title: '九宮格拍貼機 (弘大必去合體行程)', date: '6/19 全天可用', url: 'https://naver.me/GRuKQwQb', notice: '營業時間：12:00 - 21:00。全體 7 人一定要一起拍大合照！' },
+            { id: 'tk5', type: 'Link', title: '行李特工 (行李寄送與運送服務)', date: '6/21 早上辦理', url: 'https://www.kkday.com/zh-tw/product/536098?srsltid=AfmBOoqrbQXAiyLkLGcQ_uiP5N_t7yvQ7mHql-YdU0VdqsYQxbdqRgL0', notice: '費用參考：$536/件。直接將大行李從弘大住處運送到東大門，換飯店免自己搬。' },
+            { id: 'tk6', type: 'Ticket', title: 'Sevit 三島水上浮艇 (Tubester)', date: '6/21 18:00 - 19:30', notice: '體驗漢江觀光水上浮艇。結束後強烈建議全體直接在現場叫計程車回東大門，免除走回捷運站的勞累。' },
+            { id: 'tk7', type: 'Flight', title: '中華航空 CI0161 (首爾仁川二航 ➔ 台北一航)', date: '6/24 12:45 - 14:20', code: 'EBX8K6', model: 'A333', notice: '回程班機。出發前兩天記得上網選位。' }
         ];
 
         const defaultTripData = [
             // 6/17 DAY 1
-            { id: '17_1', dateIndex: 0, startTime: '15:30', name: '搭乘中華航空 CI0162', address: '桃園機場第一航廈', category: 'Flight', note: '15:30 - 19:05 飛抵首爾仁川二航\n機型 333，訂位代號: EBX8K6' },
-            { id: '17_2', dateIndex: 0, startTime: '19:50', name: '出海關搭乘機場巴士', address: '仁川機場二航 1樓15-17號出口', category: 'Transport', note: '搭乘機場巴士 6002 號至弘大，車程約 60 分鐘' },
-            { id: '17_3', dateIndex: 0, startTime: '21:00', name: '弘大吃晚餐 (5人)', address: '弘大住宿周邊', category: 'Food', note: '尚未決定餐廳，先於弘大附近簡單解決' },
-            { id: '17_4', dateIndex: 0, startTime: '住宿', name: '弘大住處入住', address: '首尔特别市 麻浦区 东桥洞 152-4', category: 'Hotel', note: '地鐵：弘益大學站2號線\n電梯：走路9分鐘(搬行李推薦)\n樓梯：走路3分鐘' },
-
+            { id: '17_1', dateIndex: 0, startTime: '15:30', name: '航班：台北一航 ➔ 首爾仁川二航入境', address: '桃園國際機場 / 仁川國際機場', category: 'Flight', note: '15:30 - 19:05 搭乘華航 CI0162\n機型 333，訂位代號: EBX8K6' },
+            { id: '17_2', dateIndex: 0, startTime: '19:05', name: '抵達、入境與領取行李', address: '仁川國際機場第二航廈', category: 'Sightseeing', note: '下飛機、通關、拿行李，耗時約 30-40 分鐘' },
+            { id: '17_3', dateIndex: 0, startTime: '19:50', name: '搭乘機場巴士前往弘大', address: '仁川機場二航 1樓15-17號出口', category: 'Transport', note: '搭乘機場巴士 6002 號，車程約 60 分鐘' },
+            { id: '17_4', dateIndex: 0, startTime: '21:00', name: '晚餐：弘大商圈享用', address: '弘大住宿附近餐廳', category: 'Food', note: '推薦：豬腳小姐 (Myth Jokbal) 或者是用民宿叫外送 No more pizza！' },
+            { id: '17_5', dateIndex: 0, startTime: '住宿', name: '入住弘大公寓住處 (至 DAY-4)', address: '首尔特别市 麻浦区 东桥洞 152-4', category: 'Hotel', note: '🚇 鄰近地鐵弘益大學站 2 號線\n電梯路線：走路 9 分鐘 (搬重行李推薦)\n樓梯路線：走路 3 分鐘' },
             // 6/18 DAY 2
-            { id: '18_1', dateIndex: 1, startTime: '09:20', name: '5人小組弘大出發', address: '地鐵弘益大學站', category: 'Transport', note: '搭乘地鐵 ② 號線由 弘益大學站 ➔ 聖水站 (約30分鐘)' },
-            { id: '18_2', dateIndex: 1, startTime: '10:00', name: '逛百變怪遊樂場 & 喝咖啡', address: '聖水洞展區', category: 'Sightseeing', note: '10:00 - 12:00 逛展、喝咖啡休息，慢慢散步到另一個展區' },
-            { id: '18_3', dateIndex: 1, startTime: '早午餐', name: '聖水洞美食 (5人)', address: '聖水洞周邊', category: 'Food', note: '尚未決定午餐餐廳' },
-            { id: '18_4', dateIndex: 1, startTime: '12:00', name: '寶可夢秘密森林', address: '2026首爾國際園藝博覽會', category: 'Sightseeing', note: '12:00 - 14:00 戶外賞花與園藝博覽會展區' },
-            { id: '18_5', dateIndex: 1, startTime: '14:30', name: '出發前往首爾大公園', address: '首爾大公園', category: 'Transport', note: '搭地鐵轉乘車程約 60 分鐘' },
-            { id: '18_6', dateIndex: 1, startTime: '15:30', name: '首爾大公園遊玩', address: '首爾大公園動物園', category: 'Sightseeing', note: '15:30 - 18:00 搭乘纜車賞花、看要不要逛動物園\n票價：$386 (含纜車2回+動物園入場)' },
-            { id: '18_7', dateIndex: 1, startTime: '18:00', name: '搭車回弘大與阿姨會合', address: '弘大住處', category: 'Transport', note: '阿姨與表妹 2人搭大韓航空 (13:20-16:50) 抵達首爾\n全體 7 人正式大合體！' },
-            { id: '18_8', dateIndex: 1, startTime: '晚餐', name: '肉夢 烤肉 (7人)', address: '肉夢烤肉 弘大店', category: 'Food', note: '⚠️ 5/19 開放訂位，記得上線確認具體訂位時間！' },
-            { id: '18_9', dateIndex: 1, startTime: '住宿', name: '弘大住處', address: '首尔特别市 麻浦区 东桥洞 152-4', category: 'Hotel', note: '同前一晚住處' },
-
+            { id: '18_1', dateIndex: 1, startTime: '09:20', name: '從弘大住宿出發', address: '弘大住處', category: 'Transport', note: '帶長輩出門走走散步囉！' },
+            { id: '18_2', dateIndex: 1, startTime: '09:30', name: '聖水洞：百變怪遊樂場', address: '聖水站 3 號出口', category: 'Sightseeing', note: '09:30 - 10:00 弘大站 ➔ 聖水站\n逛逛遊樂場展區、喝咖啡休息，漫步至下個點' },
+            { id: '18_3', dateIndex: 1, startTime: '12:00', name: '寶可夢秘密森林 ＆ 午餐', address: '2026首爾國際園藝博覽會', category: 'Food', note: '博覽會綠意賞花。\n午餐美食推薦：Jojo 刀削麵 或 安木豬肉湯飯。' },
+            { id: '18_4', dateIndex: 1, startTime: '14:30', name: '首爾大公園遊玩', address: '首爾大公園動物園', category: 'Sightseeing', note: '14:30 - 18:00 搭乘熱門天空纜車賞花與看動物園\n視當天長輩腳力與天氣決定是否前往' },
+            { id: '18_5', dateIndex: 1, startTime: '18:00', name: '搭車返回弘大與阿姨會合', address: '弘大住處', category: 'Transport', note: '阿姨與表妹 2人搭大韓航空 (13:20-16:50) 正式抵達加入！\n全體 7 人正式展開合體大會師。' },
+            { id: '18_6', dateIndex: 1, startTime: '20:00', name: '晚餐：鳳山精肉 (烤肉)', address: '鳳山精肉 烤肉店', category: 'Food', note: '⚠️ 5/19 開放訂位，記得上網確認時間！' },
+            { id: '18_7', dateIndex: 1, startTime: '住宿', name: '弘大住處', address: '首尔特别市 麻浦区 东桥洞 152-4', category: 'Hotel', note: '同弘大公寓住所' },
             // 6/19 DAY 3
-            { id: '19_1', dateIndex: 2, startTime: '09:00', name: '飯店出發', address: '弘大/延南洞', category: 'Transport', note: '安排早晨輕鬆慢活逛街行程' },
-            { id: '19_2', dateIndex: 2, startTime: '午餐', name: '延南洞或弘大美食', address: '延南洞商圈', category: 'Food', note: '尚未決定午餐' },
-            { id: '19_3', dateIndex: 2, startTime: '16:00', name: '下午分頭特色打卡行程', address: '首爾各區', category: 'Sightseeing', note: '【分流規劃】\n1. 我+男友：16:00-18:00 逛 T1 Base Camp 電競部\n2. 表妹+妹妹：出發前往韓星熱門景點\n3. 阿姨+媽媽：找特色咖啡廳喝下午茶休息' },
-            { id: '19_4', dateIndex: 2, startTime: '下午', name: '合體必拍：九宮格拍貼機', address: '九宮格拍貼店', category: 'Camera', note: '全體 7 人一定要合拍的家族拍貼紀念！\n營業時間: 12:00 - 21:00' },
-            { id: '19_5', dateIndex: 2, startTime: '18:00', name: '望遠市場會合吃晚餐', address: '望遠市場', category: 'Food', note: '下午 16:00 到晚上 19:00 之間皆可自由品嚐在地小吃' },
-            { id: '19_6', dateIndex: 2, startTime: '住宿', name: '弘大住處', address: '首尔特别市 麻浦区 东桥洞 152-4', category: 'Hotel', note: '明天要換住處，睡前記得大整理行李' },
-
+            { id: '19_1', dateIndex: 2, startTime: '09:00', name: '從弘大出發', address: '弘大/延南洞商圈', category: 'Sightseeing', note: '安排悠閒放鬆的早晨輕鬆逛街行程' },
+            { id: '19_2', dateIndex: 2, startTime: '中午', name: '延南洞或弘大商圈午餐', address: '延南洞美食街', category: 'Food', note: '午餐推薦：Hotel De GGOODD 義式輕食 或是是在地傳統馬鈴薯丸子湯' },
+            { id: '19_3', dateIndex: 2, startTime: '16:00', name: '分流探索 ＆ T1 Base Camp', address: '弘大商圈', category: 'Sightseeing', note: '16:00 - 18:00 分頭行動：\n1. 我跟男友：逛 T1 Base Camp 電競基地\n2. 表妹+妹妹：朝盛韓星熱門景點\n3. 阿姨+媽媽：找特色咖啡廳喝咖啡休息' },
+            { id: '19_4', dateIndex: 2, startTime: '下午', name: '家族合體必拍：九宮格拍貼機', address: '九宮格拍貼地圖網址專屬店', category: 'Camera', note: '營業時間: 12:00 - 21:00\n全體 7 人一定要聚在一起拍的九宮格家族合照紀念！' },
+            { id: '19_5', dateIndex: 2, startTime: '18:00', name: '望遠市場會合 ＆ 晚餐', address: '望遠市場', category: 'Food', note: '傳統市場在地銅板小吃大聚集，大家一起會合吃晚餐！' },
+            { id: '19_6', dateIndex: 2, startTime: '住宿', name: '弘大住處', address: '首尔特别市 麻浦区 东桥洞 152-4', category: 'Hotel', note: '明天要更換新飯店，睡前記得把行李整理好。' },
             // 6/20 DAY 4
-            { id: '20_1', dateIndex: 3, startTime: '08:00', name: '早起出門', address: '弘大住處', category: 'Transport', note: '準備前往汝矣島' },
-            { id: '20_2', dateIndex: 3, startTime: '10:30', name: '汝矣島現代百貨 (The Hyundai)', address: '汝矣島現代百貨', category: 'Shopping', note: '10:30 - 11:00 抵達開逛，首爾最頂級室內百貨空間' },
-            { id: '20_3', dateIndex: 3, startTime: '午餐', name: '百貨內美食街解決', address: '現代百貨地下美食街', category: 'Food', note: '各自挑選喜愛美食，尚未決定特定店家' },
-            { id: '20_4', dateIndex: 3, startTime: '下午', name: '漢江公園野餐散步', address: '汝矣島漢江公園', category: 'Sightseeing', note: '如果逛累了可以就地租野餐墊，在草地上吹風放空' },
-            { id: '20_5', dateIndex: 3, startTime: '18:30', name: '漢江遊覽船碼頭乘船', address: '漢江遊覽船乘船處', category: 'Sightseeing', note: '18:30 - 19:00 登船，從漢江水上浪漫觀賞夕陽與夜景' },
-            { id: '20_6', dateIndex: 3, startTime: '晚餐', name: '尚未決定晚餐', address: '汝矣島周邊', category: 'Food', note: '視現場狀況彈性安排' },
-            { id: '20_7', dateIndex: 3, startTime: '晚上', name: '回家整理大行李', address: '弘大住處', category: 'Hotel', note: '⚠️ 重要：要把行李分成「寄放/打包運送」與「隨身行李包」，明天一早使用托運服務' },
-
+            { id: '20_1', dateIndex: 3, startTime: '08:00', name: '早上出門前往汝矣島', address: '汝矣島', category: 'Transport', note: '避開人潮早點出發' },
+            { id: '20_2', dateIndex: 3, startTime: '10:30', name: '逛汝矣島現代百貨 (The Hyundai)', address: '汝矣島現代百貨', category: 'Shopping', note: '10:30 - 11:00 抵達開逛\n路線：弘大站 ➔ 忠正路站 ➔ 汝矣渡口站 (3 號出口)' },
+            { id: '20_3', dateIndex: 3, startTime: '中午/下午', name: '午餐 ＆ 漢江公園放鬆野餐', address: '現代百貨 / 汝矣島漢江公園', category: 'Food', note: '午餐推薦：Solsot 釜飯 (百貨內解決)\n逛累了下午就到漢江公園租野餐墊，躺在草地上吹風休息' },
+            { id: '20_4', dateIndex: 3, startTime: '18:30', name: '依戀遊船 (漢江遊覽船碼頭)', address: '漢江遊覽船乘船碼頭', category: 'Sightseeing', note: '18:30 - 19:00 登船，迎著晚風從水上欣賞璀璨的漢江城市風景與日落' },
+            { id: '20_5', dateIndex: 3, startTime: '晚上', name: '晚餐：辣奶油燉排骨', address: '辣奶油燉排骨 新村總店', category: 'Food', note: '超人氣香濃香辣排骨，為今天畫下完美句點' },
+            { id: '20_6', dateIndex: 3, startTime: '深夜', name: '回家徹底整理與分配行李', address: '弘大住處', category: 'Hotel', note: '⚠️ 重要：睡前記得把行李分成「當天行李特工運送大件」與「隨身小皮包」，方便明天寄送。' },
             // 6/21 DAY 5
-            { id: '21_1', dateIndex: 4, startTime: '09:30', name: '托運行李並出發景福宮', address: '景福宮', category: 'Transport', note: '大行李交給 KKday 當天運送至東大門飯店 ($536/件)\n9:30 - 10:00 全體出發往景福宮' },
-            { id: '21_2', dateIndex: 4, startTime: '10:00', name: '分頭行動與韓服體驗', address: '景福宮韓服店', category: 'Camera', note: '我跟男友先去預約韓服，12:00 再跟家人大合體會合拍照' },
-            { id: '21_3', dateIndex: 4, startTime: '12:30', name: '三清洞吃午餐', address: '三清洞商圈', category: 'Food', note: '參考 Funliday 三清洞美食推薦清單，吃完下午逛北村韓屋村' },
-            { id: '21_4', dateIndex: 4, startTime: '15:00', name: '北村韓屋村散步', address: '北村韓屋村', category: 'Sightseeing', note: '15:00 - 17:30 傳統韓屋漫步 (多上坡，注意長輩體力)' },
-            { id: '21_5', dateIndex: 4, startTime: '17:30', name: '益善洞逛街 ➔ 轉乘地鐵', address: '益善洞 / 鐘路三街站', category: 'Transport', note: '沿路逛下去益善洞喝咖啡。隨後於 🚇 鐘路三街站搭地鐵 ③ 號線 ➔ 高速巴士客運站 (20分鐘)' },
-            { id: '21_6', dateIndex: 4, startTime: '18:00', name: 'Sevit 三島水上浮艇', address: '盤浦漢江公園三島', category: 'Sightseeing', note: '18:00 - 19:30 網美必玩水上觀光浮艇 (Tubester)\n地鐵 8-1 或 8-2 出口走路15分，建議直接搭計程車' },
-            { id: '21_7', dateIndex: 4, startTime: '19:40', name: '盤浦大橋月光彩虹噴泉', address: '盤浦大橋人造山丘', category: 'Sightseeing', note: '19:40 - 20:00 觀賞世界級漢江彩虹噴泉秀\n地址 : 一般地區' },
-            { id: '21_8', dateIndex: 4, startTime: '晚餐', name: '尚未決定晚餐 / 的士回飯店', address: '東大門住宿', category: 'Food', note: '結束後強烈建議全體直接叫計程車回東大門住處，免去走回車站的勞累' },
-            { id: '21_9', dateIndex: 4, startTime: '住宿', name: '東大門新飯店入住', address: '14 Toegye-ro 68-gil, Gwanghui-dong, Jung-gu', category: 'Hotel', note: '捷運：東大門歷史文化公園站\n手扶梯：走路 5 分鐘即達' },
-
+            { id: '21_1', dateIndex: 4, startTime: '09:00', name: '行李特工寄放運送行李', address: '弘大住宿處', category: 'Transport', note: '使用行李特工服務 ($536/件)，大行李會當天直接幫你送去東大門飯店，雙手免提行李！' },
+            { id: '21_2', dateIndex: 4, startTime: '09:30', name: '北村韓屋村傳統逛街', address: '北村韓屋村', category: 'Sightseeing', note: '09:30 - 11:30 古色古香傳統韓屋街道漫步' },
+            { id: '21_3', dateIndex: 4, startTime: '12:00', name: '景福宮韓服拍照體驗', address: '景福宮周邊韓服店', category: 'Camera', note: '12:00 - 14:30 分頭行動：我跟男友先去預約挑選韓服，之後再和家人會合大拍照！' },
+            { id: '21_4', dateIndex: 4, startTime: '14:30', name: '午餐美食大享用', address: '景福宮商圈', category: 'Food', note: '推薦：骨炭家五花肉 (高人氣熟成肉) 或 安岩豬肉湯飯 (清爽白湯)' },
+            { id: '21_5', dateIndex: 4, startTime: '16:00', name: '益善洞逛街 ➔ 前往高速巴士客運站', address: '益善洞 / 鐘路三街站', category: 'Transport', note: '沿路逛下去益善洞喝咖啡、感受老屋新美學。\n交通：從 🚇 鐘路三街站搭地鐵 ③ 號線 ➔ 高速巴士客運站' },
+            { id: '21_6', dateIndex: 4, startTime: '18:00', name: 'Sevit 三島水上觀光浮艇', address: '盤浦漢江公園三島', category: 'Sightseeing', note: '18:00 - 19:30 體驗水上浮艇 Tubester\n⚠️ 結束後強烈建議直接全體叫計程車回東大門新住所，免得走回捷運站長輩吃不消！' },
+            { id: '21_7', dateIndex: 4, startTime: '晚上', name: '晚餐：陳玉華一隻雞', address: '東大門一隻雞一條街', category: 'Food', note: '首爾必吃代表性美食，鮮甜大蒜雞湯暖胃' },
+            { id: '21_8', dateIndex: 4, startTime: '住宿', name: '入住東大門新旅宿 (後3晚)', address: '14 Toegye-ro 68-gil, Gwanghui-dong, Jung-gu', category: 'Hotel', note: '🚇 鄰近東大門歷史文化公園站\n手扶梯出口：走路 5 分鐘即達，對長輩很方便！' },
             // 6/22 DAY 6
-            { id: '22_1', dateIndex: 5, startTime: '09:20', name: '飯店準時出發', address: '東大門歷史文化公園站', category: 'Transport', note: '搭地鐵 ② 號線 ➔ 蠶室站 3 號出口 (約 25 分鐘)' },
-            { id: '22_2', dateIndex: 5, startTime: '10:00', name: '樂天世界主題樂園', address: '樂天世界探險世界', category: 'Sightseeing', note: '10:00 - 16:00 室內外雙園區痛快遊玩' },
-            { id: '22_3', dateIndex: 5, startTime: '16:00', name: '樂天百貨逛街 & 享用大瓦房', address: '樂天百貨蠶室店', category: 'Food', note: '16:00 - 18:00 百貨避暑逛街，品嚐頂級名店大瓦房美食' },
-            { id: '22_4', dateIndex: 5, startTime: '18:30', name: 'Starfield 星空圖書館', address: 'COEX Mall 三成站', category: 'Sightseeing', note: '18:30 - 20:00 超震撼巨型書牆打卡\n交通: ② 號線 蠶室站 ➔ 三成站 (10分鐘)' },
-            { id: '22_5', dateIndex: 5, startTime: '晚餐', name: '尚未決定晚餐', address: 'COEX Mall 商圈', category: 'Food', note: '可於百貨或地下街內直接安排' },
-            { id: '22_6', dateIndex: 5, startTime: '20:00', name: '搭地鐵返回飯店', address: '東大門住宿', category: 'Transport', note: '② 號線 三成站 ➔ 東大門歷史文化公園站 (約 30 分鐘)' },
-
+            { id: '22_1', dateIndex: 5, startTime: '09:20', name: '從東大門飯店出發', address: '東大門歷史文化公園站', category: 'Transport', note: '搭乘地鐵 ② 號線 ➔ 蠶室站 3 號出口 (車程約 25 分鐘)' },
+            { id: '22_2', dateIndex: 5, startTime: '10:00', name: '樂天世界主題樂園遊玩', address: '樂天世界探險世界', category: 'Sightseeing', note: '10:00 - 16:00 室內外雙園區痛快瘋玩一整天' },
+            { id: '22_3', dateIndex: 5, startTime: '16:00', name: '樂天百貨逛街 ＆ 晚餐大瓦房', address: '樂天百貨蠶室店', category: 'Food', note: '16:00 - 18:00 百貨吹冷氣逛街。\n晚餐享用頂級米其林名店：大瓦房 (招牌正宗醬油蟹)' },
+            { id: '22_4', dateIndex: 5, startTime: '18:30', name: 'Starfield 星空圖書館', address: 'COEX Mall 三成站', category: 'Sightseeing', note: '18:30 - 20:00 震撼巨型書牆網美打卡\n交通：② 號線 蠶室站 ➔ 三成站 (10 分鐘)' },
+            { id: '22_5', dateIndex: 5, startTime: '20:00', name: '搭地鐵返回東大門飯店', address: '東大門住宿', category: 'Transport', note: '② 號線 三成站 ➔ 東大門歷史文化公園站 (車程約 30 分鐘)' },
+            { id: '22_6', dateIndex: 5, startTime: '晚上', name: 'Gen.G 網咖打卡 ＆ 晚餐第二輪', address: 'Dalmaji Plaza BBQ', category: 'Food', note: '晚餐兼宵夜：Dalmaji Plaza BBQ 烤肉\n⚠️ 本餐廳無法預訂，現場需拿號碼牌登記候位。' },
             // 6/23 DAY 7
-            { id: '23_1', dateIndex: 6, startTime: '白天', name: '聖水洞時尚逛街、買伴手禮', address: '聖水洞商圈', category: 'Shopping', note: '出門時間與午晚餐尚未決定，預留全天彈性補貨採購' },
-            { id: '23_2', dateIndex: 6, startTime: '19:00', name: '男友飯店報告 (其他人繼續逛)', address: '東大門住處 / 聖水', category: 'Transport', note: '⚠️ 19:00 - 20:00 男友羅需要回住宿線上報告！妹妹跟阿姨她們可以繼續在商圈逛街' },
-            { id: '23_3', dateIndex: 6, startTime: '晚上', name: '最後大收拾！整理行李', address: '東大門住宿', category: 'Hotel', note: '今晚要收好全部戰利品，準備明天早班機退稅辦理' },
-
+            { id: '23_1', dateIndex: 6, startTime: '白天', name: '聖水洞時尚逛街採購行程', address: '聖水洞商圈選品店', category: 'Shopping', note: '全天預留給聖水洞大採購服飾、彩妝與最後伴手禮補貨！' },
+            { id: '23_2', dateIndex: 6, startTime: '午餐', name: '聖水洞周邊精選美食', address: '聖水商圈餐廳', category: 'Food', note: '美食候補口袋名單：jojo 刀削麵、安木 或是 無垢屋 (Mugoo)' },
+            { id: '23_3', dateIndex: 6, startTime: '19:00', name: '男友飯店報告 (長輩可繼續逛)', address: '東大門住宿 / 聖水', category: 'Transport', note: '⚠️ 19:00 - 20:00 男友羅需要回東大門住宿線上報告！其他人如果體力夠可以留在商圈繼續逛街' },
+            { id: '23_4', dateIndex: 6, startTime: '20:00', name: '晚餐：民宿叫外送韓式炸雞', address: '東大門住宿', category: 'Food', note: '最後一晚在房間圍坐，叫橋村炸雞或 BHC 外送開派對！' },
+            { id: '23_5', dateIndex: 6, startTime: '深夜', name: '最後大清點！收拾打包行李', address: '東大門住宿', category: 'Hotel', note: '清點戰利品避免超重，將退稅單據另外整理好。' },
             // 6/24 DAY 8
-            { id: '24_1', dateIndex: 7, startTime: '09:30', name: '提早前往仁川機場二航', address: '仁川國際機場', category: 'Transport', note: '國際線建議提早 3 小時抵達，保留退稅與海關出境時間' },
-            { id: '24_2', dateIndex: 7, startTime: '12:45', name: '搭乘中華航空 CI0161 返台', address: '首爾仁川二航', category: 'Flight', note: '12:45 - 14:20 飛抵台北一航\n訂位代號: EBX8K6，機票出發前兩天記得上網選位！平安回家！' }
+            { id: '24_1', dateIndex: 7, startTime: '上午', name: '整理行李準備前往仁川機場', address: '東大門飯店', category: 'Transport', note: '退房，建議提早 3.5 小時前往機場二航辦理退稅與大件行李託運' },
+            { id: '24_2', dateIndex: 7, startTime: '12:45', name: '搭乘中華航空 CI0161 班機返台', address: '首爾仁川二航', category: 'Flight', note: '12:45 - 14:20 飛抵台北一航。訂位代號: EBX8K6\n機票兩天前記得上網選位。平安回家！' }
         ];
 
         const staysData = [
-            { name: '弘大設計感優質公寓民宿 (前4晚)', period: '6/17 - 6/21 (4晚)', checkIn: '15:00', checkOut: '11:00', distance: '🚇 弘益大學站2號線', mapUrl: 'https://naver.me/FSv6KH9W', note: '地址：首尔特别市 麻浦区 东桥洞 152-4。走樓梯只需 3 分鐘，攜帶大行李極力推薦搭電梯路線(約9分鐘)。' },
-            { name: '東大門便利景觀旅宿 (後3晚)', period: '6/21 - 6/24 (3晚)', checkIn: '15:00', checkOut: '11:00', distance: '🚇 東大門歷史文化公園站', note: '地址：14 Toegye-ro 68-gil, Gwanghui-dong, Jung-gu。手扶梯出口步行僅 5 分鐘，免去長輩攀爬樓梯負擔。' }
+            { name: '弘大設計感優質公寓民宿 (前4晚)', period: '6/17 - 6/21 (4晚)', checkIn: '15:00', checkOut: '11:00', distance: '🚇 地鐵弘益大學站 2 號線', mapUrl: 'https://naver.me/FSv6KH9W', note: '地址：首尔特别市 麻浦区 东桥洞 152-4。走樓梯只需 3 分鐘，若是搬運行李大隊，強力推薦繞行電梯路線約 9 分鐘。' },
+            { name: '東大門便利景觀旅宿 (後3晚)', period: '6/21 - 6/24 (3晚)', checkIn: '15:00', checkOut: '11:00', distance: '🚇 地鐵東大門歷史文化公園站', note: '地址：14 Toegye-ro 68-gil, Gwanghui-dong, Jung-gu。手扶梯出口步行僅 5 分鐘即達，完全不操長輩腳力。' }
         ];
 
         const shoppingMasterData = [
-            { id: 'k1', name: 'Tamburins 經典潤膚 / 固體香膏', category: '彩妝保養', intro: 'Jennie代言標誌性設計，金鍊護手霜與高級感蛋形香水', store: '聖水洞旗艦店 / 現代百貨', purchased: false },
-            { id: 'k2', name: 'Olive Young 護膚與縮毛孔面膜', category: '彩妝保養', intro: 'Torriden微分子玻尿酸、Mediheal敷膜、Unove高修護髮油', store: '弘大 / 東大門各大門市', purchased: false },
-            { id: 'k3', name: 'HBAF 各式風味杏仁果包裝', category: '零食伴手禮', intro: '蜂蜜奶油、芥末、烤玉米口味，長輩親友送禮萬用不踩雷', store: '蠶室樂天超市 / 東大門大賣場', purchased: false },
-            { id: 'k4', name: '韓國頂級海苔酥 / 真空包裝手工泡菜', category: '零食伴手禮', intro: '拌飯必備伴手脆海苔，泡菜切記需買全真空密封包才能託運', store: '樂天百貨地下食品街', purchased: false },
-            { id: 'k5', name: 'Mardi Mercredi 經典小雛菊系列服飾', category: '潮流服飾', intro: '最代表首爾當代街頭的大學T與標籤短袖襯衫', store: '聖水洞選品店', purchased: false }
+            { id: 'k1', name: 'Tamburins 經典潤膚 / 固體香膏', category: '彩妝保養', intro: 'Jennie代言標誌性設計，金鍊護手霜與高級感香水', store: '聖水洞旗艦店 / 現代百貨', purchased: false },
+            { id: 'k2', name: 'Olive Young 護膚與縮毛孔面膜', category: '彩妝保養', intro: 'Torriden微分子玻尿酸精華、Mediheal面膜、Unove高修護髮油', store: '弘大 / 東大門各大門市', purchased: false },
+            { id: 'k3', name: 'HBAF 各式風味杏仁果包裝', category: '零食伴手禮', intro: '蜂蜜奶油、芥末、烤玉米口味，長輩親友送禮萬用包', store: '蠶室樂天超市 / 東大門大賣場', purchased: false },
+            { id: 'k4', name: '韓國頂級海苔酥 / 真空包裝手工泡菜', category: '零食伴手禮', intro: '拌飯必備伴手脆海苔，泡菜切記需買全真空密封包才能安全託運', store: '樂天百貨地下食品街', purchased: false },
+            { id: 'k5', name: 'Mardi Mercredi 經典小雛菊系列服飾', category: '潮流服飾', intro: '最代表首爾當代街頭的大學T與休閒衛衣短袖', store: '聖水洞選品店', purchased: false }
         ];
 
         // --- 3. App 主組件 ---
-
         const App = () => {
             const [currentTab, setCurrentTab] = useState('itinerary');
             const [expandedDateIndex, setExpandedDateIndex] = useState(null);
             const [activeShopCategory, setActiveShopCategory] = useState('彩妝保養');
             const [newShopItemName, setNewShopItemName] = useState('');
-            
-            const STORAGE_SHOP = 'seoul_trip_purple_v2_final';
+            const [showBackup, setShowBackup] = useState(false);
+            const STORAGE_SHOP = 'seoul_trip_morandi_v3';
             const [shoppingItems, setShoppingItems] = useState(() => {
                 try {
                     const saved = localStorage.getItem(STORAGE_SHOP);
@@ -224,14 +241,11 @@
                     return items;
                 } catch (e) { return shoppingMasterData; }
             });
-
-            useEffect(() => { 
-                try { localStorage.setItem(STORAGE_SHOP, JSON.stringify(shoppingItems)); } catch (e) {}
+            useEffect(() => {
+                try { localStorage.setItem(STORAGE_SHOP, JSON.stringify(shoppingItems)); } catch (e) { }
             }, [shoppingItems]);
-
             const togglePurchased = (id) => setShoppingItems(shoppingItems.map(si => si.id === id ? { ...si, purchased: !si.purchased } : si));
             const deleteShopItem = (id) => setShoppingItems(shoppingItems.filter(si => si.id !== id));
-
             const handleAddShopItem = (e) => {
                 e.preventDefault();
                 if (!newShopItemName.trim()) return;
@@ -239,13 +253,13 @@
                 setShoppingItems([...shoppingItems, newItem]);
                 setNewShopItemName('');
             };
-
             const sortedDayTrips = (dayItems) => {
                 return [...dayItems].sort((a, b) => {
                     const getWeight = (t) => {
-                        if (t === '早午餐' || t === '午餐') return '12:00';
+                        if (t === '早午餐' || t === '午餐' || t === '中午') return '12:00';
                         if (t === '晚餐') return '18:00';
-                        if (t === '住宿') return '23:59';
+                        if (t === '住宿' || t === '晚上') return '23:59';
+                        if (t && t.includes('-')) { t = t.split('-')[0].trim(); }
                         if (t && t.includes(':')) {
                             const parts = t.split(':');
                             return `${parts[0].padStart(2, '0')}:${parts[1]}`;
@@ -255,48 +269,33 @@
                     return getWeight(a.startTime).localeCompare(getWeight(b.startTime));
                 });
             };
-
             return (
                 <div className="w-full min-h-screen bg-[#767fa5] relative overflow-hidden flex flex-col grain-overlay sm:rounded-2xl border border-[#eeeeee]/20 shadow-2xl">
                     <div className="absolute inset-0 pointer-events-none opacity-[0.08] dot-grid z-0"></div>
-
-                    {/* --- 置頂固定導覽區 (Header + 微圓角長方形按鈕) --- */}
+                    {/* --- 置頂固定導覽區 --- */}
                     <header className="sticky top-0 bg-[#767fa5]/90 backdrop-blur-xl z-50 border-b border-[#eeeeee]/20 p-4 pb-3 text-white shrink-0 shadow-md">
                         <div className="flex justify-between items-center px-1">
                             <div>
                                 <h1 className="text-xl font-bold tracking-tight text-white">8天7夜 首爾家族旅程</h1>
-                                <p className="text-[10px] text-[#d7dce7] font-semibold tracking-wider mt-0.5">2026/06/17 - 06/24 自由快樂行</p>
+                                <p className="text-[10px] text-[#d7dce7] font-semibold tracking-wider mt-0.5">家族尺寸：重量多選 ~ 7人</p>
                             </div>
-                            {/* 右上角固定 7 人全家福 Q 版大合照頭像（已修正雲端外連連結格式） */}
                             <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-[#eeeeee] shadow-md shrink-0 bg-white">
-                                <img 
-                                    src="https://lh3.googleusercontent.com/d/1Zz2oiQbRp3MHR0Itm558k-f8qawoI4BP" 
-                                    className="w-full h-full object-cover object-center" 
-                                    alt="家族7人Q版大合照" 
+                                <img
+                                    src="https://lh3.googleusercontent.com/d/1Zz2oiQbRp3MHR0Itm558k-f8qawoI4BP"
+                                    className="w-full h-full object-cover object-center"
+                                    alt="家族7人Q版大合照"
                                 />
                             </div>
                         </div>
-
-                        {/* 四個長方形、微圓角、固定在頂部的導覽按鈕 */}
                         <div className="grid grid-cols-4 gap-1.5 mt-3">
-                            <button onClick={() => setCurrentTab('itinerary')} className={`py-1.5 rounded-md border text-center transition-all text-xs font-bold ${currentTab === 'itinerary' ? 'bg-[#d7dce7] text-[#646464] border-[#eeeeee] shadow-sm scale-102' : 'bg-white/10 text-white/80 border-white/10 active:bg-white/20'}`}>
-                                行程
-                            </button>
-                            <button onClick={() => setCurrentTab('tickets')} className={`py-1.5 rounded-md border text-center transition-all text-xs font-bold ${currentTab === 'tickets' ? 'bg-[#d7dce7] text-[#646464] border-[#eeeeee] shadow-sm scale-102' : 'bg-white/10 text-white/80 border-white/10 active:bg-white/20'}`}>
-                                票券
-                            </button>
-                            <button onClick={() => setCurrentTab('stay')} className={`py-1.5 rounded-md border text-center transition-all text-xs font-bold ${currentTab === 'stay' ? 'bg-[#d7dce7] text-[#646464] border-[#eeeeee] shadow-sm scale-102' : 'bg-white/10 text-white/80 border-white/10 active:bg-white/20'}`}>
-                                住宿
-                            </button>
-                            <button onClick={() => setCurrentTab('shopping')} className={`py-1.5 rounded-md border text-center transition-all text-xs font-bold ${currentTab === 'shopping' ? 'bg-[#d7dce7] text-[#646464] border-[#eeeeee] shadow-sm scale-102' : 'bg-white/10 text-white/80 border-white/10 active:bg-white/20'}`}>
-                                購物
-                            </button>
+                            <button onClick={() => setCurrentTab('itinerary')} className={`py-1.5 rounded-md border text-center transition-all text-xs font-bold ${currentTab === 'itinerary' ? 'bg-[#d7dce7] text-[#646464] border-[#eeeeee] shadow-sm scale-102' : 'bg-white/10 text-white/80 border-white/10 active:bg-white/20'}`}>行程</button>
+                            <button onClick={() => setCurrentTab('tickets')} className={`py-1.5 rounded-md border text-center transition-all text-xs font-bold ${currentTab === 'tickets' ? 'bg-[#d7dce7] text-[#646464] border-[#eeeeee] shadow-sm scale-102' : 'bg-white/10 text-white/80 border-white/10 active:bg-white/20'}`}>票券</button>
+                            <button onClick={() => setCurrentTab('stay')} className={`py-1.5 rounded-md border text-center transition-all text-xs font-bold ${currentTab === 'stay' ? 'bg-[#d7dce7] text-[#646464] border-[#eeeeee] shadow-sm scale-102' : 'bg-white/10 text-white/80 border-white/10 active:bg-white/20'}`}>住宿</button>
+                            <button onClick={() => setCurrentTab('shopping')} className={`py-1.5 rounded-md border text-center transition-all text-xs font-bold ${currentTab === 'shopping' ? 'bg-[#d7dce7] text-[#646464] border-[#eeeeee] shadow-sm scale-102' : 'bg-white/10 text-white/80 border-white/10 active:bg-white/20'}`}>購物</button>
                         </div>
                     </header>
-
                     {/* --- 主內容滾動區 --- */}
                     <main className="flex-1 p-4 overflow-y-auto no-scrollbar relative z-10 animate-fade-in text-[#646464]">
-                        
                         {/* 1. 行程分頁 */}
                         {currentTab === 'itinerary' && (
                             <div className="space-y-3">
@@ -315,21 +314,52 @@
                                             </button>
                                             {isExpanded && (
                                                 <div className="px-4 pb-4 space-y-4 border-t border-[#eeeeee] pt-3 animate-fade-in bg-slate-50/50">
-                                                    {sortedDayTrips(defaultTripData.filter(t => t.dateIndex === i)).map((trip, idx) => (
-                                                        <div key={idx} className="flex gap-3 text-[#646464]">
-                                                            <span className="text-[9px] font-mono py-0.5 h-4.5 min-w-[40px] bg-white border border-[#eeeeee] text-center rounded text-[#767fa5] font-bold shadow-2xs">{trip.startTime}</span>
-                                                            <div className="flex-1">
-                                                                <div className="flex items-center gap-1.5 mb-0.5">
-                                                                    <Icon name={trip.category || "Star"} size={11} className="text-[#767fa5]" />
-                                                                    <p className="text-[12px] font-bold text-[#646464]">{trip.name}</p>
+                                                    {sortedDayTrips(defaultTripData.filter(t => t.dateIndex === i)).map((trip, idx) => {
+                                                        const isFood = trip.category === 'Food';
+                                                        const isBackup = trip.id === '18_4';
+                                                        if (isBackup && !showBackup) {
+                                                            return (
+                                                                <div key={idx} className="flex gap-3 p-1">
+                                                                    <span className="text-[9px] font-mono py-0.5 h-4.5 min-w-[40px] border border-transparent text-center rounded font-bold text-transparent select-none">14:30</span>
+                                                                    <button
+                                                                        onClick={() => setShowBackup(true)}
+                                                                        className="flex-1 py-1.5 px-3 border border-dashed border-[#767fa5]/40 rounded-lg text-center text-xs font-bold text-[#767fa5] bg-white/40 active:bg-white/80 hover:bg-white/60 transition-all flex items-center justify-center gap-1.5 shadow-2xs"
+                                                                    >
+                                                                        <Icon name="Sparkles" size={10} className="opacity-80" />
+                                                                        備案
+                                                                    </button>
                                                                 </div>
-                                                                <p className="text-[9px] text-[#646464]/60 truncate font-medium flex items-center gap-1">
-                                                                    <Icon name="MapPin" size={8}/> {trip.address}
-                                                                </p>
-                                                                {trip.note && <p className="text-[11px] text-[#646464] bg-white p-2.5 border-l-2 border-[#767fa5] rounded-r-md mt-1.5 whitespace-pre-wrap leading-relaxed shadow-2xs font-normal"> {trip.note}</p>}
+                                                            );
+                                                        }
+                                                        return (
+                                                            <div key={idx} className={`flex gap-3 text-[#646464] p-2 rounded-lg transition-colors ${isBackup ? 'border border-dashed border-[#767fa5]/30 bg-[#767fa5]/5 relative' : ''}`}>
+                                                                <span className={`text-[9px] font-mono py-0.5 h-4.5 min-w-[40px] border text-center rounded font-bold shadow-2xs ${isFood ? 'bg-white border-2 border-[#cfd3f1] text-[#767fa5]' : 'bg-white border-[#eeeeee] text-[#767fa5]'}`}>{trip.startTime}</span>
+                                                                <div className="flex-1 min-w-0">
+                                                                    <div className="flex items-center gap-1.5 mb-0.5">
+                                                                        <Icon name={trip.category || "Star"} size={11} className="text-[#767fa5]" />
+                                                                        <p className="text-[12px] font-bold truncate text-[#646464]">{trip.name} {isBackup && <span className="text-[8px] bg-[#767fa5]/20 text-[#4d5370] px-1 py-0.2 rounded font-normal ml-1">備案</span>}</p>
+                                                                        {isBackup && (
+                                                                            <button
+                                                                                onClick={() => setShowBackup(false)}
+                                                                                className="ml-auto text-[9px] text-[#767fa5]/60 hover:text-[#767fa5] font-semibold"
+                                                                                title="隱藏備案"
+                                                                            >
+                                                                                隱藏
+                                                                            </button>
+                                                                        )}
+                                                                    </div>
+                                                                    <p className="text-[9px] text-[#646464]/60 truncate font-medium flex items-center gap-1">
+                                                                        <Icon name="MapPin" size={8} /> {trip.address}
+                                                                    </p>
+                                                                    {trip.note && (
+                                                                        <p className="text-[11px] p-2.5 rounded-r-md mt-1.5 whitespace-pre-wrap leading-relaxed shadow-2xs font-normal border-l-2 bg-white border-[#767fa5] text-[#646464]">
+                                                                            {trip.note}
+                                                                        </p>
+                                                                    )}
+                                                                </div>
                                                             </div>
-                                                        </div>
-                                                    ))}
+                                                        );
+                                                    })}
                                                 </div>
                                             )}
                                         </div>
@@ -337,7 +367,6 @@
                                 })}
                             </div>
                         )}
-
                         {/* 2. 票券分頁 */}
                         {currentTab === 'tickets' && (
                             <div className="space-y-3">
@@ -352,20 +381,19 @@
                                         <p className="text-[11px] text-[#646464]/80 mt-2 bg-slate-50 p-2 rounded-lg border border-dashed border-[#eeeeee] leading-relaxed">{tk.notice}</p>
                                         {tk.url && (
                                             <button onClick={() => window.open(tk.url)} className="mt-2.5 w-full bg-white border border-[#767fa5] text-[#767fa5] py-1.5 rounded-lg text-[11px] font-bold flex items-center justify-center gap-1 active:bg-[#767fa5] active:text-white transition-all shadow-2xs">
-                                                <Icon name="Link" size={10}/> 開啟專屬 Naver / KKday 連結
+                                                <Icon name="Link" size={10} /> 開啟專屬 Naver / KKday 連結
                                             </button>
                                         )}
                                     </div>
                                 ))}
                             </div>
                         )}
-
                         {/* 3. 住宿分頁 */}
                         {currentTab === 'stay' && (
                             <div className="space-y-4">
                                 {staysData.map((h, i) => (
                                     <div key={i} className="bg-white border border-[#eeeeee] p-4 rounded-xl shadow-sm text-[#646464]">
-                                        <h4 className="font-bold text-[14px] flex items-center gap-1.5 mb-0.5 text-[#646464]"><Icon name="Hotel" size={13} className="text-[#767fa5]"/> {h.name}</h4>
+                                        <h4 className="font-bold text-[14px] flex items-center gap-1.5 mb-0.5 text-[#646464]"><Icon name="Hotel" size={13} className="text-[#767fa5]" /> {h.name}</h4>
                                         <p className="text-[10px] font-mono text-[#767fa5] mb-3 tracking-wide">{h.period}</p>
                                         <div className="grid grid-cols-2 gap-2 mb-3.5">
                                             <div className="bg-slate-50 p-2 rounded-md border border-[#eeeeee] text-center">
@@ -376,19 +404,18 @@
                                             </div>
                                         </div>
                                         <div className="space-y-2 text-[11px]">
-                                            <div className="flex items-center gap-1.5 text-[#767fa5] font-bold"><Icon name="Navigation" size={11}/> {h.distance}</div>
+                                            <div className="flex items-center gap-1.5 text-[#767fa5] font-bold"><Icon name="Navigation" size={11} /> {h.distance}</div>
                                             <p className="bg-slate-50 p-2.5 rounded-lg border-l-2 border-[#eeeeee] text-[10px] text-[#646464]/90 leading-relaxed">💡 {h.note}</p>
                                         </div>
                                         {h.mapUrl && (
                                             <button onClick={() => window.open(h.mapUrl)} className="mt-3 w-full bg-[#767fa5] text-white py-2 rounded-lg text-[11px] font-bold flex items-center justify-center gap-1 active:opacity-90 transition-all shadow-xs">
-                                                <Icon name="Map" size={12}/> 開啟 Naver Map 地圖導航
+                                                <Icon name="Map" size={12} /> 開啟 Naver Map 地圖導航
                                             </button>
                                         )}
                                     </div>
                                 ))}
                             </div>
                         )}
-
                         {/* 4. 購物分頁 */}
                         {currentTab === 'shopping' && (
                             <div className="animate-fade-in">
@@ -400,28 +427,28 @@
                                     </div>
                                     <div className="p-4 flex-1 flex flex-col">
                                         <h2 className="text-xs font-bold mb-3 tracking-wider flex items-center gap-2 text-[#767fa5]">
-                                            <Icon name="ShoppingBag" size={12}/> {activeShopCategory} CHECKLIST
+                                            <Icon name="ShoppingBag" size={12} /> {activeShopCategory} CHECKLIST
                                         </h2>
                                         <div className="flex-1 space-y-2 overflow-y-auto max-h-[250px] no-scrollbar px-0.5">
                                             {shoppingItems
                                                 .filter(item => item.category === activeShopCategory)
-                                                .sort((a,b) => a.purchased - b.purchased)
+                                                .sort((a, b) => a.purchased - b.purchased)
                                                 .map(item => (
-                                                <div key={item.id} className="flex items-center gap-2 animate-fade-in">
-                                                    <div className="flex-1 flex items-center justify-between p-3 bg-white border border-[#eeeeee] rounded-lg shadow-2xs overflow-hidden">
-                                                        <div className="flex items-center gap-2.5 flex-1 overflow-hidden">
-                                                            <button onClick={() => togglePurchased(item.id)} className={`w-4 h-4 border-2 border-[#767fa5] rounded-sm flex items-center justify-center shrink-0 transition-all ${item.purchased ? 'bg-[#767fa5]' : 'bg-white'}`}>
-                                                                {item.purchased && <Icon name="Check" size={10} className="text-white" />}
-                                                            </button>
-                                                            <div className="flex flex-col text-left truncate flex-1">
-                                                                <span className={`text-[12px] transition-all truncate ${item.purchased ? 'line-through opacity-35 italic text-[#646464]/60' : 'font-bold text-[#646464]'}`}>{item.name}</span>
-                                                                <span className="text-[9px] text-[#646464]/60 truncate">{item.intro} ({item.store})</span>
+                                                    <div key={item.id} className="flex items-center gap-2 animate-fade-in">
+                                                        <div className="flex-1 flex items-center justify-between p-3 bg-white border border-[#eeeeee] rounded-lg shadow-2xs overflow-hidden">
+                                                            <div className="flex items-center gap-2.5 flex-1 overflow-hidden">
+                                                                <button onClick={() => togglePurchased(item.id)} className={`w-4 h-4 border-2 border-[#767fa5] rounded-sm flex items-center justify-center shrink-0 transition-all ${item.purchased ? 'bg-[#767fa5]' : 'bg-white'}`}>
+                                                                    {item.purchased && <Icon name="Check" size={10} className="text-white" />}
+                                                                </button>
+                                                                <div className="flex flex-col text-left truncate flex-1">
+                                                                    <span className={`text-[12px] transition-all truncate ${item.purchased ? 'line-through opacity-35 italic text-[#646464]/60' : 'font-bold text-[#646464]'}`}>{item.name}</span>
+                                                                    <span className="text-[9px] text-[#646464]/60 truncate">{item.intro} ({item.store})</span>
+                                                                </div>
                                                             </div>
                                                         </div>
+                                                        <button onClick={() => deleteShopItem(item.id)} className="p-2 text-[#646464]/60 hover:text-red-500 transition-all bg-slate-50 rounded-lg border border-[#eeeeee]"><Icon name="X" size={11} /></button>
                                                     </div>
-                                                    <button onClick={() => deleteShopItem(item.id)} className="p-2 text-[#646464]/60 hover:text-red-500 transition-all bg-slate-50 rounded-lg border border-[#eeeeee]" ><Icon name="X" size={11} /></button>
-                                                </div>
-                                            ))}
+                                                ))}
                                         </div>
                                         <form onSubmit={handleAddShopItem} className="mt-3 flex gap-2 border-t border-[#eeeeee] pt-3">
                                             <input value={newShopItemName} onChange={e => setNewShopItemName(e.target.value)} placeholder={`新增至 ${activeShopCategory}...`} className="flex-1 bg-slate-50 border border-[#eeeeee] px-3 py-1.5 text-[11px] rounded-md outline-none focus:border-[#767fa5]" />
@@ -435,9 +462,9 @@
                 </div>
             );
         };
-
         const root = window.ReactDOM.createRoot(document.getElementById('root'));
         root.render(<App />);
     </script>
 </body>
+
 </html>
