@@ -28,6 +28,22 @@
             animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
+        @keyframes scaleUp {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .animate-scale-up {
+            animation: scaleUp 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
         /* 隱藏捲軸但保持滾動功能 */
         .no-scrollbar::-webkit-scrollbar {
             display: none;
@@ -503,6 +519,7 @@
             const [activeShopCategory, setActiveShopCategory] = useState('彩妝保養');
             const [newShopItemName, setNewShopItemName] = useState('');
             const [showBackup, setShowBackup] = useState(false);
+            const [isImgModalOpen, setIsImgModalOpen] = useState(false);
 
             // 美食分頁的篩選狀態
             const [activeFoodTag, setActiveFoodTag] = useState('全部');
@@ -566,7 +583,10 @@
                                 <h1 className="text-xl font-bold tracking-tight text-white">8天7夜 首爾家族旅程</h1>
                                 <p className="text-[10px] text-[#d7dce7] font-semibold tracking-wider mt-0.5">7人自由行- ̗̀( ˘˙ࠔ˙˘) ̖́-</p>
                             </div>
-                            <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-[#eeeeee] shadow-md shrink-0 bg-white">
+                            <div
+                                onClick={() => setIsImgModalOpen(true)}
+                                className="w-14 h-14 rounded-full overflow-hidden border-2 border-[#eeeeee] shadow-md shrink-0 bg-white cursor-pointer active:scale-95 transition-all"
+                            >
                                 <img
                                     src="https://lh3.googleusercontent.com/d/1Zz2oiQbRp3MHR0Itm558k-f8qawoI4BP"
                                     className="w-full h-full object-cover object-center"
@@ -843,6 +863,28 @@
                             </div>
                         )}
                     </main>
+
+                    {/* 圖片放大 Modal */}
+                    {isImgModalOpen && (
+                        <div
+                            className="fixed inset-0 bg-black/85 z-[9999] flex items-center justify-center p-4 animate-fade-in backdrop-blur-[2px] cursor-zoom-out"
+                            onClick={() => setIsImgModalOpen(false)}
+                        >
+                            <div className="relative max-w-[90%] max-h-[85%] bg-white p-1.5 rounded-xl shadow-2xl animate-scale-up" onClick={e => e.stopPropagation()}>
+                                <img
+                                    src="https://lh3.googleusercontent.com/d/1Zz2oiQbRp3MHR0Itm558k-f8qawoI4BP"
+                                    className="w-full h-auto max-h-[70vh] rounded-lg object-contain"
+                                    alt="家族7人Q版大合照 放大"
+                                />
+                                <button
+                                    onClick={() => setIsImgModalOpen(false)}
+                                    className="absolute -top-10 right-0 text-white hover:text-red-400 bg-white/10 hover:bg-white/20 p-2 rounded-full transition-all text-xs font-bold flex items-center justify-center gap-1 border border-white/20 px-3 cursor-pointer"
+                                >
+                                    <Icon name="X" size={12} /> 關閉
+                                </button>
+                            </div>
+                        </div>
+                    )}
                 </div>
             );
         };
