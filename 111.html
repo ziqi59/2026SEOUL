@@ -135,14 +135,14 @@
 
         // --- 2. 全域靜態資料定義 ---
         const dates = [
-            { date: '6/17', weekday: '水', title: 'DAY 1 ꒰ 飛抵首爾 ➳ 入住弘大', loc: { lat: 37.55, lon: 126.92, name: '弘大' } },
-            { date: '6/18', weekday: '木', title: 'DAY 2 ꒰ 聖水玩樂 ＆ 首爾大公園', loc: { lat: 37.54, lon: 127.05, name: '聖水/大公園' } },
-            { date: '6/19', weekday: '金', title: 'DAY 3 ꒰ 弘大逛街 ＆ T1打卡商圈', loc: { lat: 37.56, lon: 126.92, name: '弘大' } },
+            { date: '6/17', weekday: '水', title: 'DAY 1 ꒰ 飛抵首爾 ➳ 入住弘大', loc: { lat: 37.47, lon: 126.43, name: '仁川二航' } },
+            { date: '6/18', weekday: '木', title: 'DAY 2 ꒰ 聖水玩樂 ＆ 首爾大公園', loc: { lat: 37.54, lon: 127.05, name: '聖水洞' } },
+            { date: '6/19', weekday: '金', title: 'DAY 3 ꒰ 弘大逛街 ＆ T1打卡商圈', loc: { lat: 37.56, lon: 126.92, name: '延南/弘大' } },
             { date: '6/20', weekday: '土', title: 'DAY 4 ꒰ 現代百貨 ＆ 漢江依戀遊船', loc: { lat: 37.52, lon: 126.92, name: '汝矣島' } },
-            { date: '6/21', weekday: '日', title: 'DAY 5 ꒰ 北村景福宮 ＆ 三島水上浮艇', loc: { lat: 37.57, lon: 126.97, name: '景福宮/東大門' } },
-            { date: '6/22', weekday: '月', title: 'DAY 6 ꒰ 樂天世界 ＆ 星空圖書館', loc: { lat: 37.51, lon: 127.10, name: '蠶室' } },
-            { date: '6/23', weekday: '火', title: 'DAY 7 ꒰ 聖水採購 ＆ 炸雞外送夜', loc: { lat: 37.54, lon: 127.05, name: '聖水/東大門' } },
-            { date: '6/24', weekday: '水', title: 'DAY 8 ꒰ 返程出境 ➳ 平安回台灣', loc: { lat: 37.46, lon: 126.45, name: '仁川' } },
+            { date: '6/21', weekday: '日', title: 'DAY 5 ꒰ 北村景福宮 ＆ 三島水上浮艇', loc: { lat: 37.57, lon: 126.97, name: '景福宮' } },
+            { date: '6/22', weekday: '月', title: 'DAY 6 ꒰ 樂天世界 ＆ 星空圖書館', loc: { lat: 37.51, lon: 127.10, name: '樂天世界' } },
+            { date: '6/23', weekday: '火', title: 'DAY 7 ꒰ 聖水採購 ＆ 炸雞外送夜', loc: { lat: 37.54, lon: 127.05, name: '聖水洞' } },
+            { date: '6/24', weekday: '水', title: 'DAY 8 ꒰ 返程出境 ➳ 平安回台灣', loc: { lat: 25.08, lon: 121.22, name: '桃園機場' } },
         ];
 
         const ticketsData = [
@@ -212,8 +212,28 @@
         ];
 
         const staysData = [
-            { name: '弘大設計感優質公寓民宿 (前4晚)', period: '6/17 - 6/21 (4晚)', checkIn: '15:00', checkOut: '11:00', distance: '🚇 地鐵弘益大學站 2 號線', mapUrl: 'https://naver.me/FSv6KH9W', note: '地址：首尔特别市 麻浦区 东桥洞 152-4。走樓梯只需 3 分鐘，若是搬運行李大隊，強力推薦繞行電梯路線約 9 分鐘。' },
-            { name: '東大門便利景觀旅宿 (後3晚)', period: '6/21 - 6/24 (3晚)', checkIn: '15:00', checkOut: '11:00', distance: '🚇 地鐵東大門歷史文化公園站', note: '地址：14 Toegye-ro 68-gil, Gwanghui-dong, Jung-gu。手扶梯出口步行僅 5 分鐘即達，完全不操長輩腳力。' }
+            {
+                name: '弘大設計感優質公寓民宿 (前4晚)',
+                period: '6/17 - 6/21 (4晚)',
+                checkIn: '16:00',
+                checkOut: '11:00',
+                code: 'HMYTN8FDSW',
+                method: '密碼鎖',
+                distance: '🚇 弘益大學站 2 號線',
+                mapUrl: 'https://naver.me/FSv6KH9W',
+                note: '🚇 弘益大學站 2 號線：\n• 8 號出口 (有電梯)：走路 9 分鐘 (搬運重行李推薦)\n• 3 號出口 (僅樓梯)：走路 3 分鐘'
+            },
+            {
+                name: '東大門便利景觀旅宿 (後3晚)',
+                period: '6/21 - 6/24 (3晚)',
+                checkIn: '17:00',
+                checkOut: '11:00',
+                code: 'HMCJCWKBAX',
+                method: '密碼鎖',
+                distance: '🚇 東大門歷史文化公園站 2 號線',
+                mapUrl: 'https://naver.me/FoEopjCi',
+                note: '🚇 東大門歷史文化公園站 2 號線：\n• 3 號出口 (有手扶梯)：走路 5 分鐘'
+            }
         ];
 
         const shoppingMasterData = [
@@ -664,7 +684,7 @@
                                     <div key={i} className="bg-white border border-[#eeeeee] p-4 rounded-xl shadow-sm text-[#646464]">
                                         <h4 className="font-bold text-[14px] flex items-center gap-1.5 mb-0.5 text-[#646464]"><Icon name="Hotel" size={13} className="text-[#767fa5]" /> {h.name}</h4>
                                         <p className="text-[10px] font-mono text-[#767fa5] mb-3 tracking-wide">{h.period}</p>
-                                        <div className="grid grid-cols-2 gap-2 mb-3.5">
+                                        <div className="grid grid-cols-2 gap-2 mb-2">
                                             <div className="bg-slate-50 p-2 rounded-md border border-[#eeeeee] text-center">
                                                 <p className="text-[8px] font-bold uppercase text-slate-400 mb-0.5">Check-In</p><p className="text-xs font-bold text-[#646464]">{h.checkIn}</p>
                                             </div>
@@ -672,9 +692,21 @@
                                                 <p className="text-[8px] font-bold uppercase text-slate-400 mb-0.5">Check-Out</p><p className="text-xs font-bold text-[#646464]">{h.checkOut}</p>
                                             </div>
                                         </div>
+                                        {h.code && (
+                                            <div className="grid grid-cols-2 gap-2 mb-3.5">
+                                                <div className="bg-slate-50 p-2 rounded-md border border-[#eeeeee] text-center">
+                                                    <p className="text-[8px] font-bold uppercase text-slate-400 mb-0.5">確認碼</p>
+                                                    <p className="text-[11px] font-mono font-bold text-[#4d5370] tracking-wider">{h.code}</p>
+                                                </div>
+                                                <div className="bg-slate-50 p-2 rounded-md border border-[#eeeeee] text-center">
+                                                    <p className="text-[8px] font-bold uppercase text-slate-400 mb-0.5">入住方式</p>
+                                                    <p className="text-[11px] font-bold text-[#646464]">{h.method}</p>
+                                                </div>
+                                            </div>
+                                        )}
                                         <div className="space-y-2 text-[11px]">
                                             <div className="flex items-center gap-1.5 text-[#767fa5] font-bold"><Icon name="Navigation" size={11} /> {h.distance}</div>
-                                            <p className="bg-slate-50 p-2.5 rounded-lg border-l-2 border-[#eeeeee] text-[10px] text-[#646464]/90 leading-relaxed">💡 {h.note}</p>
+                                            <p className="bg-slate-50 p-2.5 rounded-lg border-l-2 border-[#eeeeee] text-[10px] text-[#646464]/90 whitespace-pre-line leading-relaxed">💡 {h.note}</p>
                                         </div>
                                         {h.mapUrl && (
                                             <button onClick={() => window.open(h.mapUrl)} className="mt-3 w-full bg-[#767fa5] text-white py-2 rounded-lg text-[11px] font-bold flex items-center justify-center gap-1 active:opacity-90 transition-all shadow-xs">
