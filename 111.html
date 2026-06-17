@@ -10,6 +10,14 @@
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/lucide@1.19.0/dist/umd/lucide.js"></script>
+
+    <script>
+        Babel.registerPreset("classic-react", {
+            presets: [
+            [Babel.availablePresets.react, { runtime: "classic" }]
+            ]
+        });
+    </script>
     <style>
         /* 頁面載入動畫 */
         @keyframes fadeIn {
@@ -91,7 +99,7 @@
 
 <body class="bg-[#5c6488] min-h-screen flex justify-center items-center py-0 sm:py-3">
     <div id="root" class="w-full max-w-[390px]"></div>
-    <script type="text/babel" data-presets="env, react">
+    <script type="text/babel" data-presets="classic-react">
         const { useState, useEffect, useMemo, useRef } = React;
 
         // --- 1. 基礎圖示與元件 ---
